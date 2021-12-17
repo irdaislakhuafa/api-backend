@@ -1,10 +1,11 @@
-package com.sample.apibackend.model.entities;
+package com.sample.apibackend.model.entities.mahasiswa;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -32,4 +33,7 @@ public class MahasiswaEntity {
 
     @Column(length = 100)
     private String angkatan;
+
+    @OneToOne
+    private Alamat alamat;
 }

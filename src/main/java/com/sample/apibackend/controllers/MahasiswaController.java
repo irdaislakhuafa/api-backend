@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sample.apibackend.helpers.ResponseContainer;
-import com.sample.apibackend.model.entities.MahasiswaEntity;
+import com.sample.apibackend.model.entities.mahasiswa.Alamat;
+import com.sample.apibackend.model.entities.mahasiswa.MahasiswaEntity;
+import com.sample.apibackend.model.repositories.AlamatRepository;
 import com.sample.apibackend.model.repositories.MahasiswaRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MahasiswaController {
     @Autowired
     private MahasiswaRepository mahasiswaRepository;
+    @Autowired
+    private AlamatRepository alamatRepository;
 
     @GetMapping("/getall")
     public ResponseEntity<?> getAll() {
@@ -78,7 +81,7 @@ public class MahasiswaController {
         }
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody MahasiswaEntity mahasiswa) {
         try {
             if (mahasiswaRepository.existsByNpm(mahasiswa.getNpm())) {
@@ -108,10 +111,12 @@ public class MahasiswaController {
             MahasiswaEntity deletedMahasiswa = mahasiswaRepository.findById(id).get();
             mahasiswaRepository.deleteById(id);
             return new ResponseEntity<>(
-                    new ResponseContainer(HttpStatus.OK, "success deleted", deletedMahasiswa), HttpStatus.OK);
+                    new ResponseContainer(HttpStatus.OK, "success deleted", deletedMahasiswa),
+                    HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(
-                    new ResponseContainer(HttpStatus.EXPECTATION_FAILED, "failed " + e.getMessage(), null),
+                    new ResponseContainer(HttpStatus.EXPECTATION_FAILED, "failed " +
+                            e.getMessage(), null),
                     HttpStatus.EXPECTATION_FAILED);
         }
     }
@@ -167,6 +172,29 @@ public class MahasiswaController {
                     new ResponseContainer(
                             HttpStatus.EXPECTATION_FAILED, "error : " + e.getLocalizedMessage(), null),
                     HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @PostMapping("/add/alamat/{npm}")
+    public ResponseEntity<?> addAlamat(@RequestBody Alamat alamat, @PathVariable("npm") String npm) {
+        MahasiswaEntity mahasiswa;
+        try {
+            mahasiswa = (mahasiswaRepository.existsByNpm(npm)) ? mahasiswaRepository.findByNpm(npm) : null;
+            // alamat.(mahasiswaRepository.findByNpm(npm).getId());
+            Alamat savedAlamat = alamatRepository.save(alamat);
+            mahasiswa.setAlamat(savedAlamat);
+            MahasiswaEntity savedMahasiswa = mahasiswaRepository.save(mahasiswa);
+            return new ResponseEntity<>(
+                    new ResponseContainer(
+                            HttpStatus.OK, "success", savedMahasiswa),
+                    HttpStatus.OK);
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+            return new ResponseEntity<>(
+                    new ResponseContainer(
+                            HttpStatus.INTERNAL_SERVER_ERROR, "error : " + e.getLocalizedMessage(), null),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

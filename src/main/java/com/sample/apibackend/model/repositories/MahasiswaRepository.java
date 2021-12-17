@@ -1,6 +1,6 @@
 package com.sample.apibackend.model.repositories;
 
-import com.sample.apibackend.model.entities.MahasiswaEntity;
+import com.sample.apibackend.model.entities.mahasiswa.MahasiswaEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
